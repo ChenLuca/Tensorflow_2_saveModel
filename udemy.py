@@ -11,15 +11,15 @@ Original file is located at
 ## Stage 1: Install dependencies and setting up GPU environment
 """
 
-!pip install tensorflow-gpu==2.0.0.alpha0
+# !pip install tensorflow-gpu==2.0.0.alpha0
 
-!pip install tqdm
+# !pip install tqdm
 
 """### Downloading the Dogs vs Cats dataset """
 
-!wget --no-check-certificate 
-    https://storage.googleapis.com/mledu-datasets/cats_and_dogs_filtered.zip \
-    -O ./cats_and_dogs_filtered.zip
+# !wget --no-check-certificate 
+#     https://storage.googleapis.com/mledu-datasets/cats_and_dogs_filtered.zip \
+#     -O ./cats_and_dogs_filtered.zip
 
 """## Stage 2: Dataset preprocessing
 
@@ -32,6 +32,21 @@ import zipfile
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
+import time
+def solve_cudnn_error():
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+    if gpus:
+        try:
+            # Currently, memory growth needs to be the same across GPUs
+            for gpu in gpus:
+                tf.config.experimental.set_memory_growth(gpu, True)
+            logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+            print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+        except RuntimeError as e:
+            # Memory growth must be set before GPUs have been initialized
+            print(e)
+
+solve_cudnn_error()
 
 from tqdm import tqdm_notebook
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
@@ -155,3 +170,9 @@ valid_loss, valid_accuracy = model.evaluate_generator(valid_generator)
 
 print("Validation accuracy after fine tuning: {}".format(valid_accuracy))
 
+t = time.time()
+
+export_path_keras = "./{}.h5".format(int(t))
+print(export_path_keras)
+
+model.save(export_path_keras)

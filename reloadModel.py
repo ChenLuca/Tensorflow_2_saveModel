@@ -44,7 +44,7 @@ valid_generator = data_gen_valid.flow_from_directory(validation_dir, target_size
 
 """     Load .h5 weight      """           
 
-h5_file = "./1606972677.h5"
+h5_file = "./1606980585.h5"
 
 reloaded = tf.keras.models.load_model(h5_file)
 

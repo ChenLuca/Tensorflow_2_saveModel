@@ -1,3 +1,4 @@
 *.h5
 checkpoints/
 cats_and_dogs_filtered/
+*.zip
