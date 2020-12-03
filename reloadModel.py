@@ -57,36 +57,40 @@ valid_loss, valid_accuracy = reloaded.evaluate_generator(valid_generator)
 
 print("Validation accuracy after fine tuning: {}".format(valid_accuracy))
 
-HEIGHT, WIDTH = (128, 128)
 
-test_img = cv.imread("./test_data/dog.2000.jpg", )
-from IPython.display import Image
-image_name = "./test_data/dog.3.jpg"
-Image(image_name)
+image_name = "./test_data/dog.2000.jpg"
 
 """Open and preprocess the image with TensorFlow:"""
 
-image = tf.io.read_file(image_name)
-image = tf.image.decode_image(image)
-image = tf.image.resize(image, (HEIGHT, WIDTH))
+tf_io_image = tf.io.read_file(image_name)
+tf_io_image = tf.image.decode_image(tf_io_image)
 
-images = tf.expand_dims(image, axis=0) / 255.0
+img = cv.imshow("tf_io_image", tf_io_image.numpy())
+cv.waitKey(0)
 
-Y = reloaded.predict(images)
-print("tf.io Y : ", Y)
+tf_io_image = tf.image.resize(tf_io_image, (128, 128))
+tf_io_image = tf.expand_dims(tf_io_image, axis=0) / 255.0
 
 
-# np_img = np.zeros((1,128,128,3))
+np_cv_img = cv.imread(image_name)
+np_cv_img = cv.cvtColor(np_cv_img, cv.COLOR_BGR2RGB) # cv2 defaults to bgr order
 
-np_img = cv.imread(image_name)
-# np_img = np_img.astype(np.float64)
-np_img = cv.resize(np_img, (128, 128), interpolation=cv.INTER_CUBIC)
+img = cv.imshow("np_cv_img", np_cv_img)
+cv.waitKey(0)
 
-np_img = np.expand_dims(np_img, axis=0)/ 255.0
+np_cv_img = cv.resize(np_cv_img, (128, 128))
+np_cv_img = np_cv_img / 255.0
+np_cv_img = np_cv_img[np.newaxis, ...].astype(np.float32)
+print("type of tf.image.decode_image(np_cv_img) : ", np_cv_img.dtype)
 
-Y = reloaded.predict(np_img)
+Y = reloaded.predict(tf_io_image)
+print("tf_io_image Y : ", Y)
 
-print("np_img Y : ", Y)
+Y = reloaded.predict(np_cv_img)
+print("np_cv_img Y : ", Y)
+
+
+cv.destroyAllWindows()
 
 """     Load .h5 weight      """           
 
