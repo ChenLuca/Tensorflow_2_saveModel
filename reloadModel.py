@@ -4,7 +4,8 @@ import tensorflow as tf
 import tensorflow_hub as hub
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.python.saved_model import tag_constants
-
+import cv2 as cv
+import numpy as np
 def solve_cudnn_error():
     gpus = tf.config.experimental.list_physical_devices('GPU')
     if gpus:
@@ -56,45 +57,76 @@ valid_loss, valid_accuracy = reloaded.evaluate_generator(valid_generator)
 
 print("Validation accuracy after fine tuning: {}".format(valid_accuracy))
 
+HEIGHT, WIDTH = (128, 128)
+
+test_img = cv.imread("./test_data/dog.2000.jpg", )
+from IPython.display import Image
+image_name = "./test_data/dog.3.jpg"
+Image(image_name)
+
+"""Open and preprocess the image with TensorFlow:"""
+
+image = tf.io.read_file(image_name)
+image = tf.image.decode_image(image)
+image = tf.image.resize(image, (HEIGHT, WIDTH))
+
+images = tf.expand_dims(image, axis=0) / 255.0
+
+Y = reloaded.predict(images)
+print("tf.io Y : ", Y)
+
+
+# np_img = np.zeros((1,128,128,3))
+
+np_img = cv.imread(image_name)
+# np_img = np_img.astype(np.float64)
+np_img = cv.resize(np_img, (128, 128), interpolation=cv.INTER_CUBIC)
+
+np_img = np.expand_dims(np_img, axis=0)/ 255.0
+
+Y = reloaded.predict(np_img)
+
+print("np_img Y : ", Y)
+
 """     Load .h5 weight      """           
 
 
 
 
-"""     Save saved_model      """   
+# """     Save saved_model      """   
 
-export_path_sm = "./checkpoints/20201103"
+# export_path_sm = "./checkpoints/20201103"
 
-#tf.saved_model.save(reloaded, export_path_sm)
+# #tf.saved_model.save(reloaded, export_path_sm)
 
-"""     Save saved_model      """           
-
-
+# """     Save saved_model      """           
 
 
-"""     Load saved_model      """       
-
-#reloaded_sm = tf.saved_model.load(export_path_sm)
-reload_sm_keras = tf.keras.models.load_model(export_path_sm)
-print("type(reloaded_sm): ", type(reload_sm_keras))
 
 
-EPOCHS = 10
-checkpoint_filepath = './checkpoints/20201103_checkpoint'
-model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-    filepath=checkpoint_filepath,
-    save_weights_only=False,
-    monitor='val_accuracy',
-    mode='max',
-    save_best_only=False,
-    save_freq="epoch")
+# """     Load saved_model      """       
 
-reload_sm_keras.fit(train_generator,  
-                    epochs=EPOCHS, 
-                    validation_data=valid_generator,
-                    callbacks=[model_checkpoint_callback])
-valid_loss, valid_accuracy = reload_sm_keras.evaluate_generator(valid_generator)
+# #reloaded_sm = tf.saved_model.load(export_path_sm)
+# reload_sm_keras = tf.keras.models.load_model(export_path_sm)
+# print("type(reloaded_sm): ", type(reload_sm_keras))
 
-print("Validation accuracy after reload and fine tuning: {}".format(valid_accuracy))
 
-"""     Load saved_model      """ 
+# EPOCHS = 10
+# checkpoint_filepath = './checkpoints/20201103_checkpoint'
+# model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+#     filepath=checkpoint_filepath,
+#     save_weights_only=False,
+#     monitor='val_accuracy',
+#     mode='max',
+#     save_best_only=False,
+#     save_freq="epoch")
+
+# reload_sm_keras.fit(train_generator,  
+#                     epochs=EPOCHS, 
+#                     validation_data=valid_generator,
+#                     callbacks=[model_checkpoint_callback])
+# valid_loss, valid_accuracy = reload_sm_keras.evaluate_generator(valid_generator)
+
+# print("Validation accuracy after reload and fine tuning: {}".format(valid_accuracy))
+
+# """     Load saved_model      """ 
