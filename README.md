@@ -1,4 +1,4 @@
-Make folder :
+Create folder :
 $ mkdir Save_model
 
 Download dataset :
